@@ -1,5 +1,6 @@
 FROM alpine:3.7
 RUN apk --no-cache add vsftpd
+RUN touch /var/log/vsftpd.log
 
 COPY start_vsftpd.sh /bin/start_vsftpd.sh
 COPY vsftpd.conf /etc/vsftpd/vsftpd.conf
