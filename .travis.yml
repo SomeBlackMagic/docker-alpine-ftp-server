@@ -36,12 +36,12 @@ env:
 before_install:
   - './.travis/docker_upgrade.sh'
 script:
-  - docker buildx version
-  - docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
-  - docker buildx create --name mybuilder
-  - docker buildx use mybuilder
-  - docker buildx inspect --bootstrap
-  - docker buildx build $CONTEXT_RELATIVE_PATH --platform=$BUILD_PLATFROM -t $CI_IMAGE  -f $DOCKERFILE_RELATIVE_PATH
+  - DOCKER_CLI_EXPERIMENTAL=enabled docker buildx version
+#  - docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
+#  - docker buildx create --name mybuilder
+#  - docker buildx use mybuilder
+#  - docker buildx inspect --bootstrap
+#  - docker buildx build $CONTEXT_RELATIVE_PATH --platform=$BUILD_PLATFROM -t $CI_IMAGE  -f $DOCKERFILE_RELATIVE_PATH
 after_success:
   # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
   - |
