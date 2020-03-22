@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  core:
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile
+    privileged: true
+    stop_signal: INT
+    user: 1000:1000
+    env_file:
+      - .env
