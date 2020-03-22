@@ -16,6 +16,7 @@ services:
   - docker
 env:
   global:
+    - DOCKER_CLI_EXPERIMENTAL=enabled
     # Used for specifying the build context relative to this file
     # Likely, this is "."
     - CONTEXT_RELATIVE_PATH=.
@@ -30,9 +31,15 @@ env:
     # Published image base name (user/image) without tag
     # Correct tag is added later
     - BASE_IMAGE=${DOCKER_USERNAME}/${APP_NAME} #DO NOT CHANGE
+    - BUILD_PLATFROM=linux/arm,linux/arm64,linux/amd64
 
 script:
-  - docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $CI_IMAGE -f $DOCKERFILE_RELATIVE_PATH $CONTEXT_RELATIVE_PATH
+  - docker buildx version
+  - docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
+  - docker buildx create --name mybuilder
+  - docker buildx use mybuilder
+  - docker buildx inspect --bootstrap
+  - docker buildx build $CONTEXT_RELATIVE_PATH --platform=$BUILD_PLATFROM -t $CI_IMAGE  -f $DOCKERFILE_RELATIVE_PATH
 after_success:
   # Tag pull request builds with ":pr-XXX" where "XXX" is the pull request number
   - |
@@ -63,19 +70,3 @@ after_success:
     fi
 notifications:
   email: false
-
-# We run ~10 builds, but only the one that deploys needs a .app bundle or .deb file
-before_deploy:
-  - docker run --name temp-container-name $CI_IMAGE /bin/true
-  - docker cp temp-container-name:/usr/bin/gate ./gate
-  - docker rm temp-container-name
-
-deploy:
-  # Releases (which are tagged) go to github
-  - provider: releases
-    skip_cleanup: true
-    api_key: $GITHUB_OAUTH_TOKEN
-    file:
-      - gate
-    on:
-      tags: true
