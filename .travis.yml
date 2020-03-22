@@ -34,7 +34,8 @@ env:
     - BUILD_PLATFROM=linux/arm,linux/arm64,linux/amd64
 
 before_install:
-  - './.travis/docker_upgrade.sh'
+#  - './.travis/docker_upgrade.sh'
+  - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 script:
   - DOCKER_CLI_EXPERIMENTAL=enabled docker buildx version
 #  - docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
